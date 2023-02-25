@@ -22,6 +22,13 @@ CREDENTIALS = {
     'Account': None # will be filled after login
 }
 
+counter = 0
+
+def get_count():
+    global counter
+    counter += 1
+    return counter
+
 
 def get_video_urls(number: str) -> str:
     """Get video urls from a series url"""
@@ -61,10 +68,9 @@ def get_section_urls(url: str) -> list:
     return urls
 
 
-def dowload_video(url: str, location: str = 'videos'):
+def dowload_video(url: str, location: str = '.'):
     r = requests.get(url, stream=True)
-    name = url.split('/')[-1]
-    with open(f"{location}/{name}", 'wb') as f:
+    with open(f"{location}/{get_count()}.mp4", 'wb') as f:
         total_length = int(r.headers.get('content-length'))
         for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
             if chunk:
