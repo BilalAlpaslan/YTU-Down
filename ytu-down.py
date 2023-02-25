@@ -1,6 +1,15 @@
-from bs4 import BeautifulSoup
-import typer
-import requests
+try:
+    from bs4 import BeautifulSoup
+    import typer
+    import requests
+    from clint.textui import progress
+except ImportError as e:
+    import os
+    os.system("pip install bs4 typer requests clint")
+    from bs4 import BeautifulSoup
+    import typer
+    import requests
+    from clint.textui import progress
 
 app = typer.Typer()
 
@@ -52,11 +61,15 @@ def get_section_urls(url: str) -> list:
     return urls
 
 
-def dowload_video(url: str):
-    r = requests.get(url)
+def dowload_video(url: str, location: str = 'videos'):
+    r = requests.get(url, stream=True)
     name = url.split('/')[-1]
-    with open(name, "wb") as f:
-        f.write(r.content)
+    with open(f"{location}/{name}", 'wb') as f:
+        total_length = int(r.headers.get('content-length'))
+        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
+            if chunk:
+                f.write(chunk)
+                f.flush()
 
 
 def save_urls(urls: list):
