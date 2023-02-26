@@ -3,7 +3,7 @@ try:
     import typer
     import requests
     from clint.textui import progress
-except ImportError as e:
+except ImportError:
     import os
     os.system("pip install bs4 typer requests clint")
     from bs4 import BeautifulSoup
@@ -19,10 +19,11 @@ CREDENTIALS = {
     'philmsapp': '',
     # fill above
 
-    'Account': None # will be filled after login
+    'Account': None  # will be filled after login
 }
 
 counter = 0
+
 
 def get_count():
     global counter
@@ -72,7 +73,7 @@ def dowload_video(url: str, location: str = '.'):
     r = requests.get(url, stream=True)
     with open(f"{location}/{get_count()}.mp4", 'wb') as f:
         total_length = int(r.headers.get('content-length'))
-        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
+        for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
             if chunk:
                 f.write(chunk)
                 f.flush()
